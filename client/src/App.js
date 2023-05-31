@@ -37,7 +37,11 @@ class App extends Component {
         // Request made to the backend api
         // Send formData object
         try {
-          await axios.post("http://localhost:8000/uploadProfilePicture", formData);  
+          await axios.post("http://localhost:8000/uploadCsv/", formData).then(
+            value => {
+                console.log(value);
+            }
+          );  
         } catch (error) {
           console.log(error)
         }
@@ -81,12 +85,12 @@ class App extends Component {
                 <h2>
                     File Upload using React!
                 </h2>
-                <form enctype="multipart/form-data">
-                    <input type="file" onChange={this.onFileChange} />
+                <div>
+                    <input type="file" onChange={this.onFileChange} name="myFile"/>
                     <button onClick={this.onFileUpload}>
                         Upload!
                     </button>
-                </form>
+                </div>
                 {this.fileData()}
             </div>
         );
