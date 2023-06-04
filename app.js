@@ -1,4 +1,3 @@
-global.dbconn = "";
 const dotenv = require('dotenv');
 
 dotenv.config()

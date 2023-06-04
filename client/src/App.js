@@ -1,25 +1,26 @@
 
 import axios from 'axios';
- 
-import React, { Component } from 'react';
-class App extends Component {
- 
-    state = {
- 
-        // Initially, no file is selected
-        selectedFile: null
-    };
- 
-    // On file select (from the pop up)
-    onFileChange = event => {
+import { useState } from "react";
+
+import React from 'react';
+import Table from './Table';
+
+function App () {
+
+    const [selectedFile,setSelectedFile]=useState(null)
+    const [columnList,setColumnList]=useState(null);
+    const [rowList,setRowList]=useState(null);
+    const [imgPath,setImgPath]=useState(null);
+    const onFileChange = event => {
+        console.log(event)
  
         // Update the state
-        this.setState({ selectedFile: event.target.files[0] });
+        setSelectedFile(event.target.files[0]);
  
     };
  
     // On file upload (click the upload button)
-    onFileUpload = async () => {
+    const onFileUpload = async () => {
  
         // Create an object of formData
         const formData = new FormData();
@@ -27,43 +28,55 @@ class App extends Component {
         // Update the formData object
         formData.append(
             "myFile",
-            this.state.selectedFile,
-            this.state.selectedFile.name
+            selectedFile,
+            selectedFile.name
         );
  
         // Details of the uploaded file
-        console.log(this.state.selectedFile);
+        console.log(selectedFile);
  
         // Request made to the backend api
         // Send formData object
         try {
-          await axios.post("http://localhost:8000/uploadCsv/", formData).then(
-            value => {
-                console.log(value);
-            }
-          );  
+          const response=await axios.post("http://localhost:8000/uploadCsv/", formData);
+          console.log(response.data);
+          setColumnList(response.data.columns);
+          setRowList(response.data.rows);  
+          setImgPath(response.data.processed_file_path);
         } catch (error) {
           console.log(error)
         }
         
     };
+
+    const tableData = (columnList,rowList) => {
+        if (columnList!=null && rowList!=null) {
+            return (
+                <div>
+                    {Table(columnList,rowList)}
+                </div>
+            )
+        } else {
+            return null;
+        }
+    }
  
     // File content to be displayed after
     // file upload is complete
-    fileData = () => {
+    const fileData = () => {
  
-        if (this.state.selectedFile) {
+        if (selectedFile) {
  
             return (
                 <div>
                     <h1>File Details:</h1>
-                    <p>File Name: {this.state.selectedFile.name}</p>
+                    <p>File Name: {selectedFile.name}</p>
  
-                    <p>File Type: {this.state.selectedFile.type}</p>
+                    <p>File Type: {selectedFile.type}</p>
  
                     <p>
                         Last Modified:{" "}
-                        {this.state.selectedFile.lastModifiedDate.toDateString()}
+                        {selectedFile.lastModifiedDate.toDateString()}
                     </p>
  
                 </div>
@@ -78,7 +91,6 @@ class App extends Component {
         }
     };
  
-    render() {
  
         return (
             <div>
@@ -86,15 +98,16 @@ class App extends Component {
                     File Upload:
                 </h2>
                 <div>
-                    <input type="file" onChange={this.onFileChange} name="myFile"/>
-                    <button onClick={this.onFileUpload}>
+                    <input type="file" onChange={onFileChange} name="myFile"/>
+                    <button onClick={onFileUpload}>
                         Upload!
                     </button>
                 </div>
-                {this.fileData()}
+                {fileData()}
+                    {rowList!=null && columnList!=null?tableData(columnList,rowList):null}
+                    {imgPath?<img src={imgPath}></img>:null}
             </div>
         );
-    }
 }
  
 export default App

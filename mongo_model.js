@@ -24,10 +24,13 @@ module.exports={
      createData:async function(inputData, callback){
         try{
           userData= new csvModel(inputData);
-          await userData.save();
+          await userData.save().then(
+            res => {
+              console.log("Data uploaded to mongo");
+            }
+          );
         } catch(err) {
           throw err;
         }
-        console.lo
      }
 }
