@@ -36,3 +36,27 @@ async function sendFilePathToDb(filePath){
 app.listen(process.env.PORT, function(){
     console.log("This server port is up and running ");
 })
+
+const fileAddress = 'filePath';
+const fileData = fs.readFileSync(fileAddress);
+
+// Create form data
+const formData = new FormData();
+formData.append('file', fileData, {
+  filename: 'file.txt',
+});
+
+// Define the Flask server endpoint
+const flaskEndpoint = 'http://flask-server:5000/upload';
+
+// Send the file to Flask
+axios.post(flaskEndpoint, formData, {
+  headers: formData.getHeaders(),
+})
+  .then(response => {
+    console.log('File uploaded successfully!');
+  })
+  .catch(error => {
+    console.error('Error uploading file:', error);
+  });
+
